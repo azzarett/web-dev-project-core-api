@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from ..models import Task, Tag
 from .tag import TagSerializer
 
@@ -9,19 +8,23 @@ class TaskSerializer(serializers.ModelSerializer):
         many=True,
         write_only=True,
         queryset=Tag.objects.all(),
-        source='tags'
+        required=False,  # Сделать необязательным
+        allow_null=True   # Разрешить null значения
     )
+    title = serializers.CharField(required=False, allow_blank=True)  # Сделать необязательным
 
     class Meta:
-        model  = Task
-        fields = ['id', 'title', 'details', 'is_done', 'tags', 'tag_ids', 'created', 'updated',]
+        model = Task
+        fields = ['id', 'title', 'details', 'is_done', 'tags', 'tag_ids', 'created', 'updated']
+        read_only_fields = ['created', 'updated']  # Поля, которые не изменяются
 
-from ..models import Task
-from .tag import TagSerializer
+    def update(self, instance, validated_data):
+        # Обновляем теги, если они переданы
+        tag_ids = validated_data.pop('tags', [])
+        instance = super().update(instance, validated_data)
 
-class TaskSerializer(serializers.ModelSerializer):
-    tags  = TagSerializer(many=True, read_only=True)
-    class Meta:
-        model  = Task
-        fields = ['id','title','details','is_done','tags','created','updated']
+        # Если tag_ids были переданы, обновляем их
+        if tag_ids is not None:
+            instance.tags.set(tag_ids)
 
+        return instance

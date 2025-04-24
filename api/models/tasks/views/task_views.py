@@ -4,7 +4,7 @@ from ..serializers.task import TaskSerializer
 
 class TaskListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class   = TaskSerializer
+    serializer_class = TaskSerializer
 
     def get_queryset(self):
         return Task.objects.filter(owner=self.request.user)
@@ -17,10 +17,10 @@ class TaskRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     GET   /tasks/<pk>/      → retrieve one task
     PUT   /tasks/<pk>/      → full update
     PATCH /tasks/<pk>/      → partial update
-    DELETE/taks/<pk>/      → delete
+    DELETE /tasks/<pk>/     → delete
     """
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class   = TaskSerializer
+    serializer_class = TaskSerializer
 
     def get_queryset(self):
         return Task.objects.filter(owner=self.request.user)
